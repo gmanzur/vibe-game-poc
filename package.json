@@ -2,13 +2,17 @@
   "name": "game-poc",
   "version": "0.0.1",
   "private": true,
+  "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "start": "vite preview"
   },
   "devDependencies": {
     "typescript": "^5.0.0",
     "vite": "^5.0.0"
-  }
+  },
+  "dependencies": {},
+  "vercel-build": "vite build"
 }
