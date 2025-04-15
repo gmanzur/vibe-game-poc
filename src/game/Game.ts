@@ -1,6 +1,7 @@
 export class Game {
   private ctx: CanvasRenderingContext2D;
   private animationFrameId: number | null = null;
+  private wanderTimeoutId: number | null = null;
 
   private readonly GRID_ROWS = 20;
   private readonly GRID_COLS = 40;
@@ -99,6 +100,44 @@ export class Game {
     );
   }
 
+  private movePlayerRandomly() {
+    // All 8 directions (dx, dy)
+    const directions = [
+      { dx: -1, dy: -1 }, // up-left
+      { dx:  0, dy: -1 }, // up
+      { dx:  1, dy: -1 }, // up-right
+      { dx: -1, dy:  0 }, // left
+      { dx:  1, dy:  0 }, // right
+      { dx: -1, dy:  1 }, // down-left
+      { dx:  0, dy:  1 }, // down
+      { dx:  1, dy:  1 }, // down-right
+    ];
+
+    // Shuffle directions to pick randomly
+    const shuffled = directions.sort(() => Math.random() - 0.5);
+
+    for (const dir of shuffled) {
+      const nx = this.player.x + dir.dx;
+      const ny = this.player.y + dir.dy;
+      if (
+        nx >= 0 && nx < this.GRID_COLS &&
+        ny >= 0 && ny < this.GRID_ROWS
+      ) {
+        this.player.x = nx;
+        this.player.y = ny;
+        break;
+      }
+    }
+  }
+
+  private scheduleWander() {
+    const delay = 1000 + Math.random() * 2000; // 1 to 3 seconds
+    this.wanderTimeoutId = window.setTimeout(() => {
+      this.movePlayerRandomly();
+      this.scheduleWander();
+    }, delay);
+  }
+
   private loop = () => {
     this.draw();
     this.animationFrameId = requestAnimationFrame(this.loop);
@@ -106,11 +145,15 @@ export class Game {
 
   start() {
     this.loop();
+    this.scheduleWander();
   }
 
   stop() {
     if (this.animationFrameId !== null) {
       cancelAnimationFrame(this.animationFrameId);
+    }
+    if (this.wanderTimeoutId !== null) {
+      clearTimeout(this.wanderTimeoutId);
     }
   }
 }
