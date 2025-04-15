@@ -100,6 +100,27 @@ export class Game {
     );
   }
 
+  private isBlocked(x: number, y: number): boolean {
+    // Check lake
+    if (
+      x >= this.lake.x &&
+      x < this.lake.x + this.lake.width &&
+      y >= this.lake.y &&
+      y < this.lake.y + this.lake.height
+    ) {
+      return true;
+    }
+    // Check rocks
+    for (const rock of this.rocks) {
+      if (rock.x === x && rock.y === y) return true;
+    }
+    // Check trees
+    for (const tree of this.trees) {
+      if (tree.x === x && tree.y === y) return true;
+    }
+    return false;
+  }
+
   private movePlayerRandomly() {
     // All 8 directions (dx, dy)
     const directions = [
@@ -121,7 +142,8 @@ export class Game {
       const ny = this.player.y + dir.dy;
       if (
         nx >= 0 && nx < this.GRID_COLS &&
-        ny >= 0 && ny < this.GRID_ROWS
+        ny >= 0 && ny < this.GRID_ROWS &&
+        !this.isBlocked(nx, ny)
       ) {
         this.player.x = nx;
         this.player.y = ny;
